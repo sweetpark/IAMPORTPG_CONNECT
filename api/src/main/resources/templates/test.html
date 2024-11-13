@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+
+    <title>Payment Page</title>
+
+    <script>
+        // Function to create an order and initiate the payment
+        function createOrder(amount) {
+            // Send POST request to create an order and generate merchant_uid
+            fetch('/create', {
+                method: 'POST',
+                body: new URLSearchParams({amount: amount}),
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                console.log(data.merchantUid);
+                if (data && data.merchantUid) {
+                    requestPay(data.merchant_uid, amount);
+                } else {
+                    alert('Order creation failed!');
+                }
+            })
+            .catch(error => console.error('Error creating order:', error));
+        }
+
+
+        function requestPay(merchantUid, amount) {
+            IMP.init('imp----');  // imp 정보
+
+            IMP.request_pay({
+                channelKey: 'channel-key-eaa7a116------',  // 채널키
+                pay_method: 'card',
+                merchant_uid: merchantUid,
+                name: 'test',
+                amount: amount,
+            }, function(response) {
+                if (response.success) {
+
+                    fetch('/payment/complete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            imp_uid: response.imp_uid,
+                            merchant_uid: response.merchant_uid
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Payment was successful!');
+                        } else {
+                            alert('Payment failed!');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Payment verification failed:', error);
+                        alert('Payment verification failed!');
+                    });
+                } else {
+                    alert('Payment failed: ' + response.error_msg);
+                }
+            });
+        }
+
+
+
+
+
+
+        // Trigger payment process on button click
+        function requestPayButtonClick() {
+            // Example amount, this can be dynamic based on selected items
+            const amount = 10000;  // Example amount in Korean Won (KRW)
+            createOrder(amount);
+        }
+    </script>
+</head>
+<body>
+<h1>Payment Page</h1>
+<button onclick="requestPayButtonClick()">결제하기</button>
+</body>
+</html>

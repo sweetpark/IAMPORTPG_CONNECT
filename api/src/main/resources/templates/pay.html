@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+
+    <!--  IMP.init("고객사 식별코드"); SDK 초기화-->
+    <!-- IMP.agency("고객사 식별코드". "티어코드"); 하위상점 초기화-->
+
+
+    <!-- 결제창 열기 -->
+    <!--
+    <script>
+    IMP.request_pay(
+      {
+        channelKey = "{콘솔 내 연동 정보의 채널키}",
+        pay_method ="card",
+        merchant_uid : "주문고유번호",
+        name ="상품이름"
+        amount= "결제가격",
+        buyer_email = "구매자 이메일",
+        buyer_name = "구매자 이름",
+        buyer_tel = "구매자 휴대폰번호",
+        buyer_addr = "구매자 주소",
+        buyer_postcode = "구매자우체국번호",
+      },
+        function(response){
+            //결제 종료시 호출되는 콜백함수
+            //response.imp_uid 값으로 결제 단건조회 API를 호출하여 결제 결과 확인
+            //결제결과처리
+            if (response.success){
+                console.log(response);
+            }else{
+                console.log(response);
+            }
+
+        },
+        //콜백함수
+        async( response) =>{
+            if (response.error_code != null){
+                return alert('결제에 실패했습니다. 에러내용 : ${response.error_msg}');
+            }
+
+            //서버로 보내기
+            const notified - await fetch('/payment/complete', {
+                method : "POST",
+                headers: {"ContentType": "application/json" },
+                body : Json.stringify({
+                    imp_uid : response.imp_uid,
+                    merchant_uid : response.merchant_uid,
+                    //기타 주문정보..
+                }),
+              });
+            },
+    );
+    </script>
+    -->
+    <title>Title</title>
+</head>
+<body>
+<button onclick="requestPay()">결제하기</button>
+</body>
+</html>
